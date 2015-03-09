@@ -16,8 +16,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let player = SKNode()
     
     //convience properties
-    let width = UIScreen.mainScreen().bounds.size.width
-    let height = UIScreen.mainScreen().bounds.size.height
+    let screenWidth = UIScreen.mainScreen().bounds.size.width
+    let screenHeight = UIScreen.mainScreen().bounds.size.height
     
     
     
@@ -32,21 +32,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundColor = SKColor.blackColor()
         physicsWorld.contactDelegate = self
         backgroundStarNode = createBackgroundStar()
-        addChild(backgroundStarNode)
-        for index in 0...20 {
-            let starNode = createStarForScreenSize(height, width: width)
-            var nodeChildren = starNode.children
-            backgroundStarNode.addChild(starNode)
-            //TODO add physics to stars!
-        }
+        //TODO -- add stars for parallax effect; create star seems to work but
+        //adding physics to them makes them disappear.  Maybe add physics outside the 
+        //create star function?
         
         
         //foreground
         foregroundNode = SKNode()
         addChild(foregroundNode)
-        let asteriodA = createAsteriodForScreenSize(UIScreen.mainScreen().bounds.size.height, width: UIScreen.mainScreen().bounds.size.width, ofType: .Small)
-        foregroundNode.addChild(asteriodA)
 
+        //add asteriods
+        var arrayOfAsteriods = [asteriodNode]()
+        for index in 0...19 {
+            let asteriodA = createAsteriodForScreenSize(screenHeight, width: screenWidth, ofType: .Small)
+            arrayOfAsteriods.append(asteriodA)
+            foregroundNode.addChild(asteriodA)
+            }
+        for index in 0 ... 19 {
+            let node = arrayOfAsteriods[index]
+            node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
+            node.physicsBody?.dynamic = true
+            node.physicsBody?.restitution = 1.0
+            node.physicsBody?.friction = 0.0
+            node.physicsBody?.angularDamping = 0.0
+            node.physicsBody?.linearDamping = 0.0
+            node.physicsBody?.affectedByGravity = false
+            node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8)/2 - 2
+            node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
+            node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
+            node.physicsBody?.collisionBitMask = 0
+
+        }
+        
         //player
         player = createPlayer()
         foregroundNode.addChild(player)
@@ -104,17 +121,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else {
             node.setScale(0.05)
         }
-        node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width/2)
-        node.physicsBody?.dynamic = true
-        node.physicsBody?.restitution = 1.0
-        node.physicsBody?.friction = 0.0
-        node.physicsBody?.angularDamping = 0.0
-        node.physicsBody?.linearDamping = 0.0
-        node.physicsBody?.affectedByGravity = false
-        node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8)/2 - 2
-        node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
-        node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
-        node.physicsBody?.collisionBitMask = 0
         node.addChild(sprite)
         return node
     }
@@ -131,6 +137,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 }
 
 /*
+
+node.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width/2)
+node.physicsBody?.dynamic = true
+node.physicsBody?.restitution = 1.0
+node.physicsBody?.friction = 0.0
+node.physicsBody?.angularDamping = 0.0
+node.physicsBody?.linearDamping = 0.0
+node.physicsBody?.affectedByGravity = false
+node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8)/2 - 2
+node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
+node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
+node.physicsBody?.collisionBitMask = 0
+
+
 let x = CGFloat(arc4random()) % UIScreen.mainScreen().bounds.size.width
 let y = CGFloat(arc4random()) % UIScreen.mainScreen().bounds.size.height
 node.size = CGSize(width: 20, height: 20)
