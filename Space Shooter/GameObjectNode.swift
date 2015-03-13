@@ -44,7 +44,12 @@ class StarNode : GameObjectNode {
 }
 
 class asteriodNode: GameObjectNode {
-    var asteriodType : AsteriodType!
+    var asteriodType : AsteriodType
+    
+    init(type: AsteriodType){
+        asteriodType = type
+        super.init()
+    }
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
         runAction(asteriodExplosionSound)

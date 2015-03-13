@@ -9,11 +9,15 @@
 
 import SpriteKit
 import UIKit
+import CoreMotion
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     let backgroundStarNode = SKNode()
     let foregroundNode = SKNode()
     let player = SKNode()
+    let motionManager = CMMotionManager()
+    var xAccel  : CGFloat = 0.0
+    var yAccel : CGFloat = 0.0
     
     //convience properties
     let screenWidth = UIScreen.mainScreen().bounds.size.width
@@ -57,16 +61,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             node.physicsBody?.angularDamping = 0.0
             node.physicsBody?.linearDamping = 0.0
             node.physicsBody?.affectedByGravity = false
-            node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8)/2 - 2
-            node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
             node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
             node.physicsBody?.collisionBitMask = 0
+            switch (node.asteriodType){
+            case .Big:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 20 - 10, dy: CGFloat(arc4random()) % 10 * -1))
+            case .Medium:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8) - 4
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 40 - 20, dy: CGFloat(arc4random()) % 20 * -1))
+            default:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 16) - 8
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
+            }
+            
 
         }
         
         //player
         player = createPlayer()
+        player.physicsBody?.velocity.dx = 100.0
         foregroundNode.addChild(player)
+        motionManager.accelerometerUpdateInterval = 0.2
+        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue(), withHandler: {(acceleromterData: CMAccelerometerData!, error: NSError!) in
+            let acceleration = acceleromterData.acceleration
+            self.xAccel = (CGFloat(acceleration.x) * 0.75) + (self.xAccel * 0.25)
+            self.yAccel = (CGFloat(acceleration.y) * 0.75) + (self.yAccel * 0.25)
+            println("xAccel = \(self.xAccel)")
+        })
         }
 
 
@@ -91,6 +113,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Player
         playerNode.physicsBody?.collisionBitMask = 0
         playerNode.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
+
         return playerNode
     }
     
@@ -107,7 +130,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createAsteriodForScreenSize(height: CGFloat, width: CGFloat, ofType type: AsteriodType) -> asteriodNode {
-        let node = asteriodNode()
+        let r = arc4random() % 6
+        var type : AsteriodType
+        switch (r) {
+        case 0:
+            type = .Big
+        case 1,2:
+            type = .Medium
+        default:
+            type = .Small
+        }
+        let node = asteriodNode(type: type)
         let thePosition = CGPoint(x: CGFloat(arc4random()) % width, y: CGFloat(arc4random()) % height)
         println("position = \(thePosition)")
         node.position = thePosition
@@ -133,6 +166,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if updateHUD {
             //TODO
         }
+    }
+    override func didSimulatePhysics() {
+        player.physicsBody?.velocity = CGVector(dx: xAccel * 400, dy: yAccel * 400)
+        if player.position.x < -20.0 {
+            player.position = CGPoint(x: self.size.width + 20, y: player.position.y)
+        } else if (player.position.x > self.size.width + 20.0) {
+            player.position = CGPoint (x: -20.0, y:player.position.y)
+        }
+        if player.position.y < -20.0 {
+            player.position = CGPoint(x: player.position.x, y: self.size.height + 20)
+        } else if (player.position.y > self.size.height + 20.0) {
+            player.position = CGPoint (x: player.position.x, y:-20.0)
+        }
+        println("velocity = \(player.physicsBody?.velocity)")
     }
 }
 
