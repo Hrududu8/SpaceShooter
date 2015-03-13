@@ -80,6 +80,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         //player
         player = createPlayer()
+        player.physicsBody = SKPhysicsBody(circleOfRadius: 20.0)
+        player.physicsBody?.dynamic = true
         player.physicsBody?.velocity.dx = 100.0
         foregroundNode.addChild(player)
         motionManager.accelerometerUpdateInterval = 0.2
@@ -87,8 +89,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let acceleration = acceleromterData.acceleration
             self.xAccel = (CGFloat(acceleration.x) * 0.75) + (self.xAccel * 0.25)
             self.yAccel = (CGFloat(acceleration.y) * 0.75) + (self.yAccel * 0.25)
-            println("xAccel = \(self.xAccel)")
-        })
+            })
         }
 
 
@@ -113,7 +114,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Player
         playerNode.physicsBody?.collisionBitMask = 0
         playerNode.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
-
         return playerNode
     }
     
@@ -142,7 +142,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         let node = asteriodNode(type: type)
         let thePosition = CGPoint(x: CGFloat(arc4random()) % width, y: CGFloat(arc4random()) % height)
-        println("position = \(thePosition)")
         node.position = thePosition
         node.name = "NODE_ASTERIOD"
         var sprite: SKSpriteNode = SKSpriteNode(imageNamed: "asteriod3.png")
@@ -179,7 +178,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if (player.position.y > self.size.height + 20.0) {
             player.position = CGPoint (x: player.position.x, y:-20.0)
         }
-        println("velocity = \(player.physicsBody?.velocity)")
     }
 }
 
