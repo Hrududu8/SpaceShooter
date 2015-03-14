@@ -49,32 +49,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             arrayOfAsteriods.append(asteriodA)
             foregroundNode.addChild(asteriodA)
             }
-        for index in 0 ... 19 {
-            let node = arrayOfAsteriods[index]
-            node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
-            node.physicsBody?.dynamic = true
-            node.physicsBody?.restitution = 0.5
-            node.physicsBody?.friction = 0.0
-            node.physicsBody?.angularDamping = 0.0
-            node.physicsBody?.linearDamping = 0.0
-            node.physicsBody?.affectedByGravity = false
-            node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
-            node.physicsBody?.collisionBitMask = 0
-            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
-            switch (node.asteriodType){
-            case .Big:
-                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
-                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 20 - 10, dy: CGFloat(arc4random()) % 10 * -1))
-            case .Medium:
-                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8) - 4
-                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 40 - 20, dy: CGFloat(arc4random()) % 20 * -1))
-            default:
-                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 16) - 8
-                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
-            }
-            
-
-        }
+        self.setAsteriodProperties(arrayOfAsteriods)
         
         //player
         player = createPlayer()
@@ -155,6 +130,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         node.addChild(sprite)
         return node
     }
+    func setAsteriodProperties(asteriods: [asteriodNode]){
+        let numberOfAsteriods = asteriods.count - 1
+        for i in 0...numberOfAsteriods {
+            let node = asteriods[i]
+            node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
+            node.physicsBody?.dynamic = true
+            node.physicsBody?.restitution = 0.5
+            node.physicsBody?.friction = 0.0
+            node.physicsBody?.angularDamping = 0.0
+            node.physicsBody?.linearDamping = 0.0
+            node.physicsBody?.affectedByGravity = false
+            node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
+            node.physicsBody?.collisionBitMask = 0
+            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
+            switch (node.asteriodType){
+            case .Big:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 20 - 10, dy: CGFloat(arc4random()) % 10 * -1))
+            case .Medium:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8) - 4
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 40 - 20, dy: CGFloat(arc4random()) % 20 * -1))
+            default:
+                node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 16) - 8
+                node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
+            }
+            if node.physicsBody?.velocity.dx == 0 {
+                node.physicsBody?.velocity.dx = 1
+            }
+            if node.physicsBody?.velocity.dy == 0 {
+                node.physicsBody?.velocity.dy = 1
+            }
+        }
+    }
+    
     
     func didBeginContact(contact: SKPhysicsContact) {
         let whichNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
