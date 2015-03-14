@@ -60,7 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             node.physicsBody?.affectedByGravity = false
             node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
             node.physicsBody?.collisionBitMask = 0
-            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod 
+            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
             switch (node.asteriodType){
             case .Big:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
@@ -109,9 +109,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.setScale(0.15)
         playerNode.addChild(sprite)
         playerNode.physicsBody?.usesPreciseCollisionDetection = true
-        playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Player
+        /*playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Player
         playerNode.physicsBody?.collisionBitMask = 0
         playerNode.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
+        */
         return playerNode
     }
     
@@ -158,8 +159,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBeginContact(contact: SKPhysicsContact) {
         let whichNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
         let other = whichNode as GameObjectNode
-        let name = other.nodeName()
-        println("\(name) collides with something")
+        var nameOne, nameTwo : String
+        if ((contact.bodyA.categoryBitMask & 0x01) == 0x01){
+            nameOne = "Asteriod"
+        } else {
+            nameOne = "what?"
+        }
+        if ((contact.bodyB.categoryBitMask & 0x01) == 0x01){
+            nameTwo = "Asteriod"
+        } else {
+            nameTwo = "what?"
+        }
+        println("\(nameOne) collides with \(nameTwo)")
         
         
     }
