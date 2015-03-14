@@ -34,6 +34,9 @@ class GameObjectNode: SKNode {
             self.removeFromParent()
         }
     }
+    func nodeName()->String{
+        return "Generic Node -- this should never be"
+    }
     
 }
 
@@ -55,6 +58,9 @@ class asteriodNode: GameObjectNode {
         runAction(asteriodExplosionSound)
         //GAME OVER
         return false
+    }
+    override func nodeName()->String{
+        return "AsteriodNode"
     }
     
     

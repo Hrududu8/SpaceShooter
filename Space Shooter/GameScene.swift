@@ -36,9 +36,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundColor = SKColor.blackColor()
         physicsWorld.contactDelegate = self
         backgroundStarNode = createBackgroundStar()
-        //TODO -- add stars for parallax effect; create star seems to work but
-        //adding physics to them makes them disappear.  Maybe add physics outside the 
-        //create star function?
         
         
         //foreground
@@ -56,13 +53,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let node = arrayOfAsteriods[index]
             node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
             node.physicsBody?.dynamic = true
-            node.physicsBody?.restitution = 1.0
+            node.physicsBody?.restitution = 0.5
             node.physicsBody?.friction = 0.0
             node.physicsBody?.angularDamping = 0.0
             node.physicsBody?.linearDamping = 0.0
             node.physicsBody?.affectedByGravity = false
             node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
             node.physicsBody?.collisionBitMask = 0
+            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod 
             switch (node.asteriodType){
             case .Big:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
@@ -158,13 +156,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didBeginContact(contact: SKPhysicsContact) {
-        var updateHUD = false
         let whichNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
         let other = whichNode as GameObjectNode
-        updateHUD = other.collisionWithPlayer(player)
-        if updateHUD {
-            //TODO
-        }
+        let name = other.nodeName()
+        println("\(name) collides with something")
+        
+        
     }
     override func didSimulatePhysics() {
         player.physicsBody?.velocity = CGVector(dx: xAccel * 400, dy: yAccel * 400)
