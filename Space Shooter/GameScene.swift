@@ -181,6 +181,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         println("\(nameOne) collides with \(nameTwo)")
         
+        //check what collided with what
+        if ((contact.bodyA.categoryBitMask == 0x01) & (contact.bodyB.categoryBitMask == 0x01)){
+            let asteriodA = contact.bodyA.node as asteriodNode
+            let asteriodB = contact.bodyB.node as asteriodNode
+            asteriodCollision(asteriodA, asteriodB: asteriodB)
+        }
+        
         
     }
     override func didSimulatePhysics() {
@@ -195,6 +202,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if (player.position.y > self.size.height + 20.0) {
             player.position = CGPoint (x: player.position.x, y:-20.0)
         }
+    }
+    func asteriodCollision(asteriodA: asteriodNode, asteriodB: asteriodNode){
+        runAction(asteriodA.asteriodExplosionSound)
     }
 }
 
