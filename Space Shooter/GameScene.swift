@@ -103,6 +103,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return node
     }
     
+    func createAsteriodForScreenSizeAtPoint(height: CGFloat, width: CGFloat, location: CGPoint, ofType type: AsteriodType) -> asteriodNode
+    {
+        let node = createAsteriodForScreenSize(height, width: width, ofType: type)
+        node.position.x = location.x
+        node.position.y = location.y
+        return node
+        
+    }
+    
+    
     func createAsteriodForScreenSize(height: CGFloat, width: CGFloat, ofType type: AsteriodType) -> asteriodNode {
         let r = arc4random() % 6
         var type : AsteriodType
@@ -166,29 +176,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func didBeginContact(contact: SKPhysicsContact) {
-        let whichNode = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node
-        let other = whichNode as GameObjectNode
-        var nameOne, nameTwo : String
-        if ((contact.bodyA.categoryBitMask & 0x01) == 0x01){
-            nameOne = "Asteriod"
-        } else {
-            nameOne = "what?"
-        }
-        if ((contact.bodyB.categoryBitMask & 0x01) == 0x01){
-            nameTwo = "Asteriod"
-        } else {
-            nameTwo = "what?"
-        }
-        println("\(nameOne) collides with \(nameTwo)")
         
         //check what collided with what
         if ((contact.bodyA.categoryBitMask == 0x01) & (contact.bodyB.categoryBitMask == 0x01)){
-            let asteriodA = contact.bodyA.node as asteriodNode
-            let asteriodB = contact.bodyB.node as asteriodNode
-            asteriodCollision(asteriodA, asteriodB: asteriodB)
+            if let asteriodA = contact.bodyA.node {
+                let safeAsteriodA = asteriodA as asteriodNode
+                if let asteriodB = contact.bodyB.node {
+                    let safeAsteriodB = asteriodB as asteriodNode
+                    asteriodCollision(safeAsteriodA, asteriodB: safeAsteriodB)
+                }
+            }
         }
-        
-        
     }
     override func didSimulatePhysics() {
         player.physicsBody?.velocity = CGVector(dx: xAccel * 400, dy: yAccel * 400)
@@ -205,7 +203,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func asteriodCollision(asteriodA: asteriodNode, asteriodB: asteriodNode){
         runAction(asteriodA.asteriodExplosionSound)
-    }
+        asteriodA.removeFromParent()
+        switch (asteriodB.asteriodType){
+        case .Big:
+            println("Big")
+            let location = asteriodB.position
+            let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Medium)
+            let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Medium)
+            let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
+            setAsteriodProperties(arrayOfAsteriods)
+            foregroundNode.addChild(newAsteriodB)
+            foregroundNode.addChild(newAsteriodA)
+        case .Medium:
+                println("Medium")
+        default:
+                println("Small")
+        }
+
+}
 }
 
 /*
