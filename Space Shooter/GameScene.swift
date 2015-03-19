@@ -1,4 +1,4 @@
-//
+
 //  GameScene.swift
 //  Space Shooter
 //
@@ -16,13 +16,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let foregroundNode = SKNode()
     let player = SKNode()
     let motionManager = CMMotionManager()
+    let kLaserInterval = 0.25
+    let kLaserSpeed : CGFloat = 100.0
     var xAccel  : CGFloat = 0.0
     var yAccel : CGFloat = 0.0
-    
+    var time1 = 0.0
     //convience properties
     let screenWidth = UIScreen.mainScreen().bounds.size.width
     let screenHeight = UIScreen.mainScreen().bounds.size.height
-    
+
+    //convenice functions
+    func randomCGPoint()->CGPoint{
+        return CGPoint(x: CGFloat(arc4random()) % screenWidth, y: CGFloat(arc4random()) % screenHeight)
+    }
     
     
     required init?(coder aDecoder: NSCoder){
@@ -111,7 +117,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return node
         
     }
-    
+    func createLaser(location: CGPoint)->laserNode{
+        let node = laserNode()
+        node.position = location
+        node.name = "LASER_NODE"
+        var sprite : SKSpriteNode = SKSpriteNode(imageNamed: "Laser.png")
+        node.addChild(sprite)
+        node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
+        node.physicsBody?.dynamic = true
+        node.physicsBody?.restitution = 0.5
+        node.physicsBody?.friction = 0.0
+        node.physicsBody?.angularDamping = 0.0
+        node.physicsBody?.linearDamping = 0.0
+        node.physicsBody?.affectedByGravity = false
+        node.physicsBody?.categoryBitMask = 0
+        node.physicsBody?.collisionBitMask = 0
+        node.physicsBody?.contactTestBitMask = 0
+        node.physicsBody?.velocity = (CGVector(dx: 0, dy: kLaserSpeed))
+            
+        return node
+    }
     
     func createAsteriodForScreenSize(height: CGFloat, width: CGFloat, ofType type: AsteriodType) -> asteriodNode {
         let r = arc4random() % 6
@@ -174,6 +199,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    override func update(currentTime: NSTimeInterval) {
+        //first get rid of old lasers
+        if(time1 == 0) {
+            time1 = currentTime
+        }
+        if (currentTime > time1 + kLaserInterval){
+            let laserShot = createLaser(player.position)
+            foregroundNode.addChild(laserShot)
+            time1 = currentTime
+        }
+        
+    }
+    
     
     func didBeginContact(contact: SKPhysicsContact) {
         
@@ -183,7 +221,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 let safeAsteriodA = asteriodA as asteriodNode
                 if let asteriodB = contact.bodyB.node {
                     let safeAsteriodB = asteriodB as asteriodNode
-                    asteriodCollision(safeAsteriodA, asteriodB: safeAsteriodB)
+                    asteriodCollision(safeAsteriodA, asteriodB: safeAsteriodB, location: contact.contactPoint)
                 }
             }
         }
@@ -201,23 +239,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             player.position = CGPoint (x: player.position.x, y:-20.0)
         }
     }
-    func asteriodCollision(asteriodA: asteriodNode, asteriodB: asteriodNode){
+    func asteriodCollision(asteriodA: asteriodNode, asteriodB: asteriodNode, location: CGPoint){
         runAction(asteriodA.asteriodExplosionSound)
         asteriodA.removeFromParent()
+        return //temporary until I get lasers working
         switch (asteriodB.asteriodType){
         case .Big:
             println("Big")
-            let location = asteriodB.position
-            let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Medium)
+            /*let location = CGPoint(x: screenWidth/2, y: screenHeight/2)
+            let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: CGPoint(x: location.x-50, y: location.y-50), ofType: .Medium)
             let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Medium)
             let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
             setAsteriodProperties(arrayOfAsteriods)
             foregroundNode.addChild(newAsteriodB)
             foregroundNode.addChild(newAsteriodA)
+*/
+
         case .Medium:
-                println("Medium")
+           println("Medium")
+           let locationA = randomCGPoint()
+           let locationB = randomCGPoint()
+           let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationA, ofType: .Medium)
+           let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationB, ofType: .Medium)
+           let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
+           setAsteriodProperties(arrayOfAsteriods)
+           foregroundNode.addChild(newAsteriodB)
+           foregroundNode.addChild(newAsteriodA)
+           //you need to make smaller and fewer asteriods
+            //and change the asteriodCollision so that it implements laser fire instead of asteriods
+            //otherwise there is a proliferation of asteriods.
         default:
-                println("Small")
+            println("Small")
+            let locationA = randomCGPoint()
+            let locationB = randomCGPoint()
+            let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationA, ofType: .Medium)
+            let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationB, ofType: .Medium)
+            let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
+            setAsteriodProperties(arrayOfAsteriods)
+            foregroundNode.addChild(newAsteriodB)
+            foregroundNode.addChild(newAsteriodA)
         }
 
 }

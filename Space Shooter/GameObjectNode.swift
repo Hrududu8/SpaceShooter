@@ -62,8 +62,17 @@ class asteriodNode: GameObjectNode {
     override func nodeName()->String{
         return "AsteriodNode"
     }
-    
-    
-    
 }
+
+class laserNode: GameObjectNode{
+    override init() {
+        super.init()
+    }
+}
+
+
+
+
+
+
 
