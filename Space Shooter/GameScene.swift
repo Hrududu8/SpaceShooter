@@ -123,17 +123,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         node.name = "LASER_NODE"
         var sprite : SKSpriteNode = SKSpriteNode(imageNamed: "Laser.png")
         node.addChild(sprite)
-        node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
-        node.physicsBody?.dynamic = true
-        node.physicsBody?.restitution = 0.5
-        node.physicsBody?.friction = 0.0
-        node.physicsBody?.angularDamping = 0.0
-        node.physicsBody?.linearDamping = 0.0
-        node.physicsBody?.affectedByGravity = false
-        node.physicsBody?.categoryBitMask = 0
-        node.physicsBody?.collisionBitMask = 0
-        node.physicsBody?.contactTestBitMask = 0
-        node.physicsBody?.velocity = (CGVector(dx: 0, dy: kLaserSpeed))
+        
             
         return node
     }
@@ -176,9 +166,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             node.physicsBody?.angularDamping = 0.0
             node.physicsBody?.linearDamping = 0.0
             node.physicsBody?.affectedByGravity = false
-            node.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Asteriod
+            node.physicsBody?.categoryBitMask = CategoryBitmask.Asteriod
             node.physicsBody?.collisionBitMask = 0
-            node.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
+            node.physicsBody?.contactTestBitMask = ContactBitmask.Asteriod
             switch (node.asteriodType){
             case .Big:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
@@ -198,6 +188,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    func setLaserProperties(laser: laserNode){
+        laser.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
+        laser.physicsBody?.dynamic = true
+        laser.physicsBody?.restitution = 0.5
+        laser.physicsBody?.friction = 0.0
+        laser.physicsBody?.angularDamping = 0.0
+        laser.physicsBody?.linearDamping = 0.0
+        laser.physicsBody?.affectedByGravity = false
+        laser.physicsBody?.categoryBitMask = CategoryBitmask.Laser
+        laser.physicsBody?.collisionBitMask = 0
+        laser.physicsBody?.contactTestBitMask = ContactBitmask.Laser
+        laser.physicsBody?.velocity = (CGVector(dx: 0, dy: kLaserSpeed))
+    }
     
     override func update(currentTime: NSTimeInterval) {
         //first get rid of old lasers
@@ -206,6 +209,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if (currentTime > time1 + kLaserInterval){
             let laserShot = createLaser(player.position)
+            setLaserProperties(laserShot)
             foregroundNode.addChild(laserShot)
             time1 = currentTime
         }
@@ -213,18 +217,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
-    func didBeginContact(contact: SKPhysicsContact) {
+    func didBeginContact(contact: SKPhysicsContact) {//you are here rukesh  you need to figure out why the assignment line keeps throwing an exception
+        let asteriodExplosionSound = SKAction.playSoundFileNamed("Grenade Explosion-SoundBible.com-2100581469.wav", waitForCompletion: false)
+        runAction(asteriodExplosionSound)
+        contact.bodyA.node?.removeFromParent()
+        contact.bodyB.node?.removeFromParent()
         
-        //check what collided with what
-        if ((contact.bodyA.categoryBitMask == 0x01) & (contact.bodyB.categoryBitMask == 0x01)){
-            if let asteriodA = contact.bodyA.node {
-                let safeAsteriodA = asteriodA as asteriodNode
-                if let asteriodB = contact.bodyB.node {
-                    let safeAsteriodB = asteriodB as asteriodNode
-                    asteriodCollision(safeAsteriodA, asteriodB: safeAsteriodB, location: contact.contactPoint)
-                }
-            }
-        }
     }
     override func didSimulatePhysics() {
         player.physicsBody?.velocity = CGVector(dx: xAccel * 400, dy: yAccel * 400)
@@ -240,7 +238,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     func asteriodCollision(asteriodA: asteriodNode, asteriodB: asteriodNode, location: CGPoint){
-        runAction(asteriodA.asteriodExplosionSound)
         asteriodA.removeFromParent()
         return //temporary until I get lasers working
         switch (asteriodB.asteriodType){

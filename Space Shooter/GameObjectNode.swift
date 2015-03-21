@@ -14,16 +14,21 @@ enum AsteriodType : Int {
     case Medium
     case Small
 }
-
-struct CollisionCategoryBitmask {
+struct CategoryBitmask {
     static let Player: UInt32 = 0x00
     static let Asteriod: UInt32 = 0x01
     static let Laser: UInt32 = 0x02
 }
 
 
+struct ContactBitmask {
+    static let Player: UInt32 = 0x00
+    static let Asteriod: UInt32 = 0x04
+    static let Laser: UInt32 = 0x01
+}
+
+
 class GameObjectNode: SKNode {
-    let asteriodExplosionSound = SKAction.playSoundFileNamed("Grenade Explosion-SoundBible.com-2100581469.wav", waitForCompletion: false)
     
     func collisionWithPlayer(player: SKNode) -> Bool {
         return false
@@ -55,7 +60,7 @@ class asteriodNode: GameObjectNode {
     }
     
     override func collisionWithPlayer(player: SKNode) -> Bool {
-        runAction(asteriodExplosionSound)
+        
         //GAME OVER
         return false
     }
