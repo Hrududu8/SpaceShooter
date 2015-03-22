@@ -128,6 +128,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return node
     }
     
+    /* you are here rukesh
+    the createAsteriod functions need to be simplified
+    currently, they ignore the type and create a random type
+    needs -- createAsteriod; createAsteriodofType(type), createAsteriodofTypeAtLocation(location, type) and createAsteriodRandom
+*/
+    
     func createAsteriodForScreenSize(height: CGFloat, width: CGFloat, ofType type: AsteriodType) -> asteriodNode {
         let r = arc4random() % 6
         var type : AsteriodType
@@ -220,6 +226,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBeginContact(contact: SKPhysicsContact) {//you are here rukesh  you need to figure out why the assignment line keeps throwing an exception
         let asteriodExplosionSound = SKAction.playSoundFileNamed("Grenade Explosion-SoundBible.com-2100581469.wav", waitForCompletion: false)
         runAction(asteriodExplosionSound)
+        let asteriod = (contact.bodyA.categoryBitMask == 0x01) ? contact.bodyA.node as asteriodNode : contact.bodyB.node as asteriodNode
+        let location = contact.contactPoint
+        switch (asteriod.asteriodType) {
+        case .Small:
+            //add animation for total destruction
+            println("Small")
+        case .Medium:
+            var asteriodArray = [asteriodNode]()
+            for index in 0..<2 {
+                let asteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Small)
+                asteriodArray.append(asteriodA)
+                foregroundNode.addChild(asteriodA)
+            }
+            setAsteriodProperties(asteriodArray)
+            
+        case .Big:
+            println("big")
+    
+}
         contact.bodyA.node?.removeFromParent()
         contact.bodyB.node?.removeFromParent()
         
