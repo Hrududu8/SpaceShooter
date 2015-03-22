@@ -51,7 +51,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //add asteriods
         var arrayOfAsteriods = [asteriodNode]()
         for index in 0...19 {
-            let asteriodA = createAsteriodForScreenSize(screenHeight, width: screenWidth, ofType: .Small)
+            let r = arc4random() % 6
+            var type : AsteriodType
+            switch (r) {
+            case 0:
+                type = .Big
+            case 1,2:
+                type = .Medium
+            default:
+                type = .Small
+            }
+            let asteriodA = createAsteriodAtRandomLocationOfType(type)
             arrayOfAsteriods.append(asteriodA)
             foregroundNode.addChild(asteriodA)
             }
@@ -90,14 +100,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     
-    func createAsteriodForScreenSizeAtPoint(height: CGFloat, width: CGFloat, location: CGPoint, ofType type: AsteriodType) -> asteriodNode
-    {
-        let node = createAsteriodForScreenSize(height, width: width, ofType: type)
-        node.position.x = location.x
-        node.position.y = location.y
-        return node
-        
-    }
+    
     func createLaser(location: CGPoint)->laserNode{
         let node = laserNode()
         node.position = location
@@ -115,30 +118,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     needs -- createAsteriod; createAsteriodofType(type), createAsteriodofTypeAtLocation(location, type) and createAsteriodRandom
 */
     
-    func createAsteriodForScreenSize(height: CGFloat, width: CGFloat, ofType type: AsteriodType) -> asteriodNode {
-        let r = arc4random() % 6
-        var type : AsteriodType
-        switch (r) {
-        case 0:
-            type = .Big
-        case 1,2:
-            type = .Medium
-        default:
-            type = .Small
-        }
-        let node = asteriodNode(type: type)
-        let thePosition = CGPoint(x: CGFloat(arc4random()) % width, y: CGFloat(arc4random()) % height)
-        node.position = thePosition
-        node.name = "NODE_ASTERIOD"
-        var sprite: SKSpriteNode = SKSpriteNode(imageNamed: "asteriod3.png")
+    func createAsteriodAtLocation(location: CGPoint, ofType type: AsteriodType) -> asteriodNode{
+        let node = createAsteriod()
+        node.position = location
         node.asteriodType = type
         if type == .Big {
-                node.setScale(0.15)
+            node.setScale(0.15)
         } else if type == .Medium {
             node.setScale(0.10)
         } else {
             node.setScale(0.05)
         }
+        return node
+    }
+    func createAsteriodAtRandomLocationOfType(type : AsteriodType) -> asteriodNode{
+        let thePosition = CGPoint(x: CGFloat(arc4random()) % screenWidth, y: CGFloat(arc4random()) % screenHeight)
+        let node = createAsteriodAtLocation(thePosition, ofType: type)
+        return node
+    }
+    
+    func createAsteriod() -> asteriodNode {
+        let node = asteriodNode(type: .Small)
+        node.name = "NODE_ASTERIOD"
+        var sprite: SKSpriteNode = SKSpriteNode(imageNamed: "asteriod3.png")
         node.addChild(sprite)
         return node
     }
@@ -204,7 +206,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
-    func didBeginContact(contact: SKPhysicsContact) {//you are here rukesh  you need to figure out why the assignment line keeps throwing an exception
+    func didBeginContact(contact: SKPhysicsContact) {
         let asteriodExplosionSound = SKAction.playSoundFileNamed("Grenade Explosion-SoundBible.com-2100581469.wav", waitForCompletion: false)
         runAction(asteriodExplosionSound)
         let asteriod = (contact.bodyA.categoryBitMask == 0x01) ? contact.bodyA.node as asteriodNode : contact.bodyB.node as asteriodNode
@@ -216,7 +218,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case .Medium:
             var asteriodArray = [asteriodNode]()
             for index in 0..<2 {
-                let asteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: location, ofType: .Small)
+                let asteriodA = createAsteriodAtLocation(location, ofType: .Small)
                 asteriodArray.append(asteriodA)
                 foregroundNode.addChild(asteriodA)
             }
@@ -262,6 +264,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
            println("Medium")
            let locationA = randomCGPoint()
            let locationB = randomCGPoint()
+           /*
            let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationA, ofType: .Medium)
            let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationB, ofType: .Medium)
            let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
@@ -271,16 +274,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
            //you need to make smaller and fewer asteriods
             //and change the asteriodCollision so that it implements laser fire instead of asteriods
             //otherwise there is a proliferation of asteriods.
+            */
         default:
             println("Small")
             let locationA = randomCGPoint()
             let locationB = randomCGPoint()
+            /*
             let newAsteriodA = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationA, ofType: .Medium)
             let newAsteriodB = createAsteriodForScreenSizeAtPoint(screenHeight, width: screenWidth, location: locationB, ofType: .Medium)
             let arrayOfAsteriods = [newAsteriodA, newAsteriodB]
             setAsteriodProperties(arrayOfAsteriods)
             foregroundNode.addChild(newAsteriodB)
             foregroundNode.addChild(newAsteriodA)
+*/
         }
 
 }

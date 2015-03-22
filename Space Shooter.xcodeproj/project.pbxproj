@@ -20,6 +20,7 @@
 		96653D0A1AA8030000B2C2DF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96653D081AA8030000B2C2DF /* LaunchScreen.xib */; };
 		96653D161AA8030000B2C2DF /* Space_ShooterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96653D151AA8030000B2C2DF /* Space_ShooterTests.swift */; };
 		96653D201AA80B4800B2C2DF /* star1.png in Resources */ = {isa = PBXBuildFile; fileRef = 96653D1F1AA80B4800B2C2DF /* star1.png */; };
+		96B4DFF81ABF6BA1007D7B50 /* notes in Resources */ = {isa = PBXBuildFile; fileRef = 96B4DFF71ABF6BA1007D7B50 /* notes */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		96653D141AA8030000B2C2DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96653D151AA8030000B2C2DF /* Space_ShooterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Space_ShooterTests.swift; sourceTree = "<group>"; };
 		96653D1F1AA80B4800B2C2DF /* star1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = star1.png; sourceTree = "<group>"; };
+		96B4DFF71ABF6BA1007D7B50 /* notes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 		96653CED1AA8030000B2C2DF = {
 			isa = PBXGroup;
 			children = (
+				96B4DFF71ABF6BA1007D7B50 /* notes */,
 				96653CF81AA8030000B2C2DF /* Space Shooter */,
 				96653D121AA8030000B2C2DF /* Space ShooterTests */,
 				96653CF71AA8030000B2C2DF /* Products */,
@@ -213,6 +216,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96B4DFF81ABF6BA1007D7B50 /* notes in Resources */,
 				96653D0A1AA8030000B2C2DF /* LaunchScreen.xib in Resources */,
 				9663B5821AA9394000B3F5EE /* starbackground5.png in Resources */,
 				96653D201AA80B4800B2C2DF /* star1.png in Resources */,

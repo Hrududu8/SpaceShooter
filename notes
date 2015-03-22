@@ -1,0 +1,14 @@
+var safeType = AsteriodType.self
+if var safeType = type {
+println("hi")
+}
+else {
+}
+
+
+//random location
+
+
+
+
+node.asteriodType = type
