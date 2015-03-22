@@ -41,7 +41,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //background
         backgroundColor = SKColor.blackColor()
         physicsWorld.contactDelegate = self
-        backgroundStarNode = createBackgroundStar()
+        
         
         
         //foreground
@@ -73,16 +73,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
 
     
-    func createBackgroundStar()-> SKNode{
-        let backgroundStarNode = SKNode()
-        for index in 0...10 {
-            let node = SKSpriteNode(imageNamed: "starbackground5.png")
-            node.position = CGPoint(x:0, y: index * 250)
-            node.name = "ASTERIOD"
-            backgroundStarNode.addChild(node)
-        }
-        return backgroundStarNode
-    }
+    
     func createPlayer()->SKNode {
         let playerNode = SKNode()
         playerNode.position = CGPoint(x: self.size.width/2, y: 80)
@@ -97,17 +88,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return playerNode
     }
     
-    func createStarForScreenSize(height: CGFloat, width: CGFloat) -> StarNode {
-        let node = StarNode()
-        let thePosition = CGPoint(x: CGFloat(arc4random()) % width, y: CGFloat(arc4random()) % height)
-        node.position = thePosition
-        node.name = "NODE_STAR"
-        var sprite: SKSpriteNode = SKSpriteNode(imageNamed: "star1.png")
-        node.setScale(0.05)
-        node.addChild(sprite)
-                //node.physicsBody?.velocity.dy = ((CGFloat(arc4random() % 2)) == 0) ? 5 : 1
-        return node
-    }
+    
     
     func createAsteriodForScreenSizeAtPoint(height: CGFloat, width: CGFloat, location: CGPoint, ofType type: AsteriodType) -> asteriodNode
     {

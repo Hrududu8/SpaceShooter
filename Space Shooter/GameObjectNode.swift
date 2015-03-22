@@ -45,11 +45,7 @@ class GameObjectNode: SKNode {
     
 }
 
-class StarNode : GameObjectNode {
-    override func collisionWithPlayer(player: SKNode) -> Bool {
-        return false
-    }
-}
+
 
 class asteriodNode: GameObjectNode {
     var asteriodType : AsteriodType
