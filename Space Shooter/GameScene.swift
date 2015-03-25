@@ -91,10 +91,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.setScale(0.15)
         playerNode.addChild(sprite)
         playerNode.physicsBody?.usesPreciseCollisionDetection = true
-        /*playerNode.physicsBody?.categoryBitMask = CollisionCategoryBitmask.Player
-        playerNode.physicsBody?.collisionBitMask = 0
-        playerNode.physicsBody?.contactTestBitMask = CollisionCategoryBitmask.Asteriod
-        */
+        playerNode.physicsBody?.collisionBitMask = 0x00
+        playerNode.physicsBody?.categoryBitMask = 0x02
         return playerNode
     }
     
@@ -148,24 +146,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let numberOfAsteriods = asteriods.count - 1
         for i in 0...numberOfAsteriods {
             let node = asteriods[i]
-            node.physicsBody = SKPhysicsBody(circleOfRadius: 20.0) //the number 20 is a hack
-            node.physicsBody?.dynamic = true
-            node.physicsBody?.restitution = 0.5
-            node.physicsBody?.friction = 0.0
-            node.physicsBody?.angularDamping = 0.0
-            node.physicsBody?.linearDamping = 0.0
+            node.physicsBody = SKPhysicsBody(circleOfRadius: 10.0) //the number 20 is a hack
             node.physicsBody?.affectedByGravity = false
-            node.physicsBody?.categoryBitMask = CategoryBitmask.Asteriod
-            node.physicsBody?.collisionBitMask = 0
-            node.physicsBody?.contactTestBitMask = ContactBitmask.Asteriod
+            node.physicsBody?.categoryBitMask = 0x01
+            node.physicsBody?.contactTestBitMask = 0x02
             switch (node.asteriodType){
             case .Big:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 4) - 2
                 node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 20 - 10, dy: CGFloat(arc4random()) % 10 * -1))
-            case .Medium:
+           case .Medium:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 8) - 4
                 node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 40 - 20, dy: CGFloat(arc4random()) % 20 * -1))
-            default:
+           default:
                 node.physicsBody?.angularVelocity = (CGFloat(arc4random()) % 16) - 8
                 node.physicsBody?.velocity = (CGVector(dx: CGFloat(arc4random()) % 80 - 40, dy: CGFloat(arc4random()) % 40 * -1))
             }
@@ -185,14 +177,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         laser.physicsBody?.angularDamping = 0.0
         laser.physicsBody?.linearDamping = 0.0
         laser.physicsBody?.affectedByGravity = false
-        laser.physicsBody?.categoryBitMask = CategoryBitmask.Laser
-        laser.physicsBody?.collisionBitMask = 0
-        laser.physicsBody?.contactTestBitMask = ContactBitmask.Laser
+        laser.physicsBody?.categoryBitMask = 0x02
+        laser.physicsBody?.contactTestBitMask = 0x00
         laser.physicsBody?.velocity = (CGVector(dx: 0, dy: kLaserSpeed))
     }
     
+    
+    
     override func update(currentTime: NSTimeInterval) {
         //first get rid of old lasers
+        
+        //get rid of defunct asteriods
+        foregroundNode.enumerateChildNodesWithName("NODE_ASTERIOD"){
+            node, stop in
+            if let asteriod = node as? asteriodNode {
+            if asteriod.shouldDelete == true {
+                node.removeFromParent()
+            }
+        }
+        }
+        
         if(time1 == 0) {
             time1 = currentTime
         }
@@ -204,34 +208,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
     }
-    
-    
     func didBeginContact(contact: SKPhysicsContact) {
         let asteriodExplosionSound = SKAction.playSoundFileNamed("Grenade Explosion-SoundBible.com-2100581469.wav", waitForCompletion: false)
         runAction(asteriodExplosionSound)
-        let asteriod = (contact.bodyA.categoryBitMask == 0x01) ? contact.bodyA.node as asteriodNode : contact.bodyB.node as asteriodNode
-        let location = contact.contactPoint
-        switch (asteriod.asteriodType) {
-        case .Small:
-            //add animation for total destruction
-            println("Small")
-        case .Medium:
-            var asteriodArray = [asteriodNode]()
-            for index in 0..<2 {
-                let asteriodA = createAsteriodAtLocation(location, ofType: .Small)
-                asteriodArray.append(asteriodA)
-                foregroundNode.addChild(asteriodA)
+        if let object = contact.bodyA?.node {
+            if object.name == "NODE_ASTERIOD" {
+                let asteriod = object as asteriodNode
+                asteriod.shouldDelete = true
+            } else if let object = contact.bodyB?.node {
+                if object.name == "NODE_ASTERIOD" {
+                    let asteriod = object as asteriodNode
+                    asteriod.shouldDelete = true
+                }
             }
-            setAsteriodProperties(asteriodArray)
-            
-        case .Big:
-            println("big")
-    
-}
-        contact.bodyA.node?.removeFromParent()
-        contact.bodyB.node?.removeFromParent()
-        
+        }
     }
+
+
     override func didSimulatePhysics() {
         player.physicsBody?.velocity = CGVector(dx: xAccel * 400, dy: yAccel * 400)
         if player.position.x < -20.0 {

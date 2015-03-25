@@ -49,6 +49,7 @@ class GameObjectNode: SKNode {
 
 class asteriodNode: GameObjectNode {
     var asteriodType : AsteriodType
+    var shouldDelete : Bool = false
     
     init(type: AsteriodType){
         asteriodType = type
