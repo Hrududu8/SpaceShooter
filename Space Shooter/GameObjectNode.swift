@@ -29,7 +29,7 @@ struct ContactBitmask {
 
 
 class GameObjectNode: SKNode {
-    
+    var shouldDelete : Bool = false
     func collisionWithPlayer(player: SKNode) -> Bool {
         return false
     }
@@ -49,7 +49,7 @@ class GameObjectNode: SKNode {
 
 class asteriodNode: GameObjectNode {
     var asteriodType : AsteriodType
-    var shouldDelete : Bool = false
+    
     
     init(type: AsteriodType){
         asteriodType = type
@@ -67,7 +67,9 @@ class asteriodNode: GameObjectNode {
 }
 
 class laserNode: GameObjectNode{
+    var creationTime : NSTimeInterval
     override init() {
+        creationTime = 0.0
         super.init()
     }
 }
